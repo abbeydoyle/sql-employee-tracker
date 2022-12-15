@@ -1,0 +1,25 @@
+{
+  "name": "sql-employee-tracker",
+  "version": "1.0.0",
+  "description": "An app to view and manage the departments, roles, and employees in a company",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abbeydoyle/sql-employee-tracker.git"
+  },
+  "author": "Abigail Doyle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abbeydoyle/sql-employee-tracker/issues"
+  },
+  "homepage": "https://github.com/abbeydoyle/sql-employee-tracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^9.1.4",
+    "mysql2": "^2.3.3",
+    "node": "^19.3.0"
+  }
+}
