@@ -3,6 +3,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const { listenerCount } = require('process');
+const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 // declare port
 const PORT = process.env.PORT || 3001;
@@ -25,7 +26,11 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_db database.`)
 );
 
-
+db.connect(err => {
+      if (err) throw err;
+      console.log(`Database connection successful via id` + db.threadID);
+      initialQuestion();
+})
 
 
 // opening question
@@ -55,12 +60,19 @@ const initialQuestion = () => {
                   case "Add department": addDepartment();
                   break;
                   // TODO: write app function
-                  default: 
+                  default: db.end;
+                  console.log(`Thank you for visiting!`);
                   break;
             }
       })
 }
 
 // TODO: view functions will be table queries
+
+viewEmployees = () => {
+      db.query(`SELECT * FROM employees`, (err, result) => {
+            
+      })
+}
 
 // TODO: add functions will be prompts then queries
