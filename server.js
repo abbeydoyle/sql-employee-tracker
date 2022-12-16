@@ -2,7 +2,7 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-const { listenerCount } = require('process');
+// const { listenerCount } = require('process');
 const Connection = require('mysql2/typings/mysql/lib/Connection');
 
 // declare port
@@ -70,8 +70,26 @@ const initialQuestion = () => {
 // TODO: view functions will be table queries
 
 viewEmployees = () => {
-      db.query(`SELECT * FROM employees`, (err, result) => {
-            
+      db.query(`SELECT * FROM employee`, (err, result) => {
+            if (err) throw err;
+            console.table(result);
+            initialQuestion();
+      })
+}
+
+viewRoles = () => {
+      db.query(`SELECT * FROM role`, (err, result) => {
+            if (err) throw err;
+            console.table(result);
+            initialQuestion();
+      })
+}
+
+viewDepartments = () => {
+      db.query(`SELECT * FROM department`, (err, result) => {
+            if (err) throw err;
+            console.table(result);
+            initialQuestion();
       })
 }
 
