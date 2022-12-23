@@ -2,8 +2,8 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-// const { listenerCount } = require('process');
-const Connection = require('mysql2/typings/mysql/lib/Connection');
+// const Connection = require('mysql2/typings/mysql/lib/Connection');
+const { listenerCount } = require('process');
 
 // declare port
 const PORT = process.env.PORT || 3001;
@@ -20,7 +20,7 @@ const db = mysql.createConnection(
     // MySQL username,
     user: 'root',
     // MySQL password
-    password: '',
+    password: 'password',
     database: 'employee_db'
   },
   console.log(`Connected to the employee_db database.`)
@@ -72,6 +72,7 @@ const initialQuestion = () => {
 viewEmployees = () => {
       db.query(`SELECT * FROM employee`, (err, result) => {
             if (err) throw err;
+            console.log(response.length + ` employees found:`)
             console.table(result);
             initialQuestion();
       })
@@ -94,3 +95,97 @@ viewDepartments = () => {
 }
 
 // TODO: add functions will be prompts then queries
+
+addEmployees = () => {
+      // db.query(`SELECT * FROM employee, role`, (err, result) => {
+      //       if (err) throw err;
+      
+      inquirer.prompt ([
+            {
+                  type: `input`,
+                  name: `employeeFirst`,
+                  message: `What's the first name of this employee?`,
+                  validate: employeeFirstInput => {
+                        if (employeeFirstInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter your employee's  first name`);
+                              return false;
+                        }
+                  }
+            },
+
+            {
+                  type: `input`,
+                  name: `employeeLast`,
+                  message: `What's the last name of this employee?`,
+                  validate: employeeLastInput => {
+                        if (employeeLastInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter your employee's  last name`);
+                              return false;
+                        }
+                  }
+            },
+
+            {
+                  type: `input`,
+                  name: `employeeRole`,
+                  message: `What's this employee's role?`,
+                  validate: employeeRoleInput => {
+                        if (employeeRoleInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter your employee's  role`);
+                              return false;
+                        }
+                  }
+            },
+
+            {
+                  type: `input`,
+                  name: `employeeManager`,
+                  message: `Who is the manager of this employee?`,
+                  validate: employeeManagerInput => {
+                        if (employeeManagerInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter your employee's  manager`);
+                              return false;
+                        }
+                  }
+            }
+      ]).then((answers) => {
+            db.query(`SELECT * FROM employee, role`, (err, result) => {
+                  if (err) throw err;
+                  for (var i = 0; i < result.length; i++) {
+                        if (result[i].title === answers.role) {
+                            var role = result[i];
+                        }
+                    }
+
+                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answers.employeeFirst, answers.employeeLast, role.id, answers.employeeManager], (err, result) => {
+                        if (err) throw err;
+                        console.log(`Added ${answers.employeeFirst} ${answers.employeeLast} to the database.`)
+                        initialQuestion();
+                    });
+            })     
+      })
+      // })
+}
+
+addRole = () => {
+
+}
+
+addDepartment = () => {
+      inquirer.prompt ([
+            {
+                  type: `input`,
+                  title: `dptName`,
+                  message: `What is the name of this department?`,
+                  validate: (dptNameInput),
+            }
+      ])
+}
