@@ -86,6 +86,7 @@ viewEmployees = () => {
 viewRoles = () => {
       db.query(`${queryRoles}`, (err, result) => {
             if (err) throw err;
+            console.log(chalk.bgHex('#526b48').white('\n Viewing all roles: \n'))
             console.table(result);
             initialQuestion();
       })
@@ -94,16 +95,19 @@ viewRoles = () => {
 viewDepartments = () => {
       db.query(`${queryDepartments}`, (err, result) => {
             if (err) throw err;
+            console.log(chalk.bgHex('#526b48').white('\n Viewing all departments: \n'))
             console.table(result);
             initialQuestion();
       })
 };
 
 addDepartment = () => {
+      db.query(`SELECT * FROM department`, (err, result) =>{
+            if (err) throw err;
       inquirer.prompt ([
             {
                   type: `input`,
-                  title: `dptName`,
+                  name: `dptName`,
                   message: `What is the name of this department?`,
                   validate: (dptNameInput) => {
                         if (dptNameInput) {
@@ -117,20 +121,21 @@ addDepartment = () => {
       ]).then((response) => {
             db.query(`INSERT INTO department SET ?`, 
         {
-            department_name: response.dptName,
+            name: response.dptName,
         },
         (err, res) => {
             if (err) throw err;
-            console.log(`${response.dptName} successfully added to database `);
+            console.log(chalk.bgHex('#526b48').white(`\n ${response.dptName} successfully added to database \n`))
             initialQuestion();
         })
       })
+})
 };
 
 addRole = () => {
       db.query(`SELECT * FROM department;`, (err, res) => {
             if (err) throw err;
-            let departments = res.map(department => ({name: department.department_name, value: department.department_id }));
+            let departments = res.map(department => ({name: department.name, value: department.id }));
             inquirer.prompt([
                 {
                   type: 'input',
@@ -167,7 +172,7 @@ addRole = () => {
                   choices: departments
                 }
             ]).then((response) => {
-                connection.query(`INSERT INTO role SET ?`, 
+                db.query(`INSERT INTO role SET ?`, 
                 {
                     title: response.roleName,
                     salary: response.roleSalary,
@@ -176,12 +181,14 @@ addRole = () => {
                 (err, res) => {
                     if (err) throw err;
                     console.log(`${response.roleName} successfully added to database`);
+                    console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
                     initialQuestion();
                 })
             })
         })
 };
 
+// FIXME: doesnt work
 addEmployees = () => {
       db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
@@ -232,6 +239,7 @@ addEmployees = () => {
                         choices: employees,
                   }
                 ]).then((response) => {
+                  console.log(response.employeeFirst, response.employeeLast, response.employeeRole, response.employeeManager)
                     db.query(`INSERT INTO employee SET ?`, 
                     {
                         first_name: response.employeeFirst,
@@ -241,6 +249,7 @@ addEmployees = () => {
                     }, 
                     (err, res) => {
                         if (err) throw err;
+                        console.log('error not here')
                     })
                     db.query(`INSERT INTO role SET ?`, 
                     {
@@ -249,9 +258,40 @@ addEmployees = () => {
                     (err, res) => {
                         if (err) throw err;
                         console.log(`${response.employeeFirst} ${response.employeeLast} successfully added to database!`);
-                        initialQuestion();
                     })
+                    initialQuestion();
+                  // let newEmployeeRole = "";
+                  // let newEmployeeManager = "";
+                  // db.query(`SELECT role_id FROM role WHERE role.title = "${response.employeeRole}"`, (err, result) => {
+                  //       if (err) throw err;
+                  //       newEmployeeRole = result[0].role_id;
+
+                  //           db.query(`SELECT manager.id as id FROM employee LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE CONCAT(manager.first_name, " ", manager.last_name) = "${response.employeeManager}" GROUP BY manager.id;`, (err, result) => {
+                  //             if (err) throw err;
+                  //             newEmployeeManager = result[0].id;
+
+                  //             db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${response.employeeFirst}", "${response.employeeLast}", ${newEmployeeRole}, ${newEmployeeManager})`, (err, result) => {
+                  //                   if (err) throw err;
+                  //                   initialQuestion();
+                  //             })
+                  //           })
+                  // })
+                  
+
                 })
             })
         })
 }
+
+// addEmployees = () => {
+//       db.query(`SELECT role.title AS title FROM role;`, (err, result) => {
+//             if (err) throw err;
+//             let roleArray = result
+//             let roles = roleArray.map(function (obj) {
+//                   return obj.title;
+//                 });
+            
+//                 db.query(`SELECT `)
+//       })
+      
+// }
