@@ -46,7 +46,7 @@ const initialQuestion = () => {
                   type: `list`,
                   name: `purpose`,
                   message: `What would you like to do?`,
-                  options: [`View all employees`, `Add employee`, `Update employee role`, `View all roles`, `Add role`, `View all departments`, 'Add department', `Exit application`]
+                  choices: [`View all employees`, `Add employee`, `Update employee role`, `View all roles`, `Add role`, `View all departments`, 'Add department', `Exit application`]
             }
       ])
       .then(function(response) {
