@@ -39,11 +39,6 @@ const db = mysql.createConnection(
       initialQuestion();
 });
 
-// empty arrays for responsive inquirer list choices
-let roles = [];
-
-
-
 // opening question
 const initialQuestion = () => {
       inquirer.prompt ([
@@ -76,22 +71,6 @@ const initialQuestion = () => {
                   break;
             }
       });
-
-      // used for responsive role list in add function inquirer prompt
-      db.query(`SELECT role.title AS title FROM role;`, (err, result) => {
-            if (err) throw err;
-            let roles = result.map(function(obj) {
-                  return obj.title;
-                });
-      })
-
-      // used for responsive manager list in add function inquirer prompt
-      db.query(`SELECT CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE manager.id > 0 GROUP BY manager.first_name, manager.last_name;`, (err, result) => {
-            if (err) throw err;
-            let managers = result.map(function(obj) {
-                  return obj.manager
-            })
-      })
 };
 
 viewEmployees = () => {
@@ -118,66 +97,159 @@ viewDepartments = () => {
       })
 };
 
-addEmployees = () => {
+addDepartment = () => {
       inquirer.prompt ([
             {
                   type: `input`,
-                  name: `employeeFirst`,
-                  message: `What's the first name of this employee?`,
-                  validate: employeeFirstInput => {
-                        if (employeeFirstInput) {
+                  title: `dptName`,
+                  message: `What is the name of this department?`,
+                  validate: (dptNameInput) => {
+                        if (dptNameInput) {
                               return true;
                         } else {
-                              console.log(`Please enter your employee's  first name`);
-                              return false;
-                        }
-                  }
-            },
-
-            {
-                  type: `input`,
-                  name: `employeeLast`,
-                  message: `What's the last name of this employee?`,
-                  validate: employeeLastInput => {
-                        if (employeeLastInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter your employee's  last name`);
-                              return false;
-                        }
-                  }
-            },
-
-            {
-                  type: `input`,
-                  name: `employeeRole`,
-                  message: `What's this employee's role?`,
-                  validate: employeeRoleInput => {
-                        if (employeeRoleInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter your employee's  role`);
-                              return false;
-                        }
-                  }
-            },
-
-            {
-                  type: `input`,
-                  name: `employeeManager`,
-                  message: `Who is the manager of this employee?`,
-                  validate: employeeManagerInput => {
-                        if (employeeManagerInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter your employee's  manager`);
+                              console.log(`Please enter the department name`);
                               return false;
                         }
                   }
             }
-      ])
-      .then((answers) => {
-            db.query(``)
-
+      ]).then((response) => {
+            db.query(`INSERT INTO department SET ?`, 
+        {
+            department_name: response.dptName,
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${response.dptName} successfully added to database `);
+            initialQuestion();
+        })
       })
+};
+
+addRole = () => {
+      db.query(`SELECT * FROM department;`, (err, res) => {
+            if (err) throw err;
+            let departments = res.map(department => ({name: department.department_name, value: department.department_id }));
+            inquirer.prompt([
+                {
+                  type: 'input',
+                  name: 'roleName',
+                  message: 'What is the name of the role you want to add?',  
+                  validate: (roleNameInput) => {
+                        if (roleNameInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter the role`);
+                              return false;
+                        }
+                  }
+                },
+
+                {
+                  type: 'input',
+                  name: 'roleSalary',
+                  message: 'What is the salary of the role you want to add?',
+                  validate: (roleSalaryInput) => {
+                        if (roleSalaryInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter the salary`);
+                              return false;
+                        }
+                  }
+                },
+
+                {
+                  type: 'list',
+                  name: 'roleDept',
+                  message: 'Which department do you want to add the new role to?',
+                  choices: departments
+                }
+            ]).then((response) => {
+                connection.query(`INSERT INTO role SET ?`, 
+                {
+                    title: response.roleName,
+                    salary: response.roleSalary,
+                    department_id: response.roleDept,
+                },
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(`${response.roleName} successfully added to database`);
+                    initialQuestion();
+                })
+            })
+        })
+};
+
+addEmployees = () => {
+      db.query(`SELECT * FROM role;`, (err, res) => {
+            if (err) throw err;
+            let roles = res.map(role => ({name: role.title, value: role.role_id }));
+            db.query(`SELECT * FROM employee;`, (err, res) => {
+                if (err) throw err;
+                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.employee_id}));
+                inquirer.prompt ([
+                  {
+                        type: `input`,
+                        name: `employeeFirst`,
+                        message: `What's the first name of this employee?`,
+                        validate: employeeFirstInput => {
+                              if (employeeFirstInput) {
+                                    return true;
+                              } else {
+                                    console.log(`Please enter your employee's  first name`);
+                                    return false;
+                              }
+                        }
+                  },
+      
+                  {
+                        type: `input`,
+                        name: `employeeLast`,
+                        message: `What's the last name of this employee?`,
+                        validate: employeeLastInput => {
+                              if (employeeLastInput) {
+                                    return true;
+                              } else {
+                                    console.log(`Please enter your employee's  last name`);
+                                    return false;
+                              }
+                        }
+                  },
+      
+                  {
+                        type: `list`,
+                        name: `employeeRole`,
+                        message: `What's this employee's role?`,
+                        choices: roles,
+                  },
+      
+                  {
+                        type: `list`,
+                        name: `employeeManager`,
+                        message: `Who is the manager of this employee?`,
+                        choices: employees,
+                  }
+                ]).then((response) => {
+                    db.query(`INSERT INTO employee SET ?`, 
+                    {
+                        first_name: response.employeeFirst,
+                        last_name: response.employeeLast,
+                        role_id: response.employeeRole,
+                        manager_id: response.employeeManager,
+                    }, 
+                    (err, res) => {
+                        if (err) throw err;
+                    })
+                    db.query(`INSERT INTO role SET ?`, 
+                    {
+                        department_id: response.dept,
+                    }, 
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log(`${response.employeeFirst} ${response.employeeLast} successfully added to database!`);
+                        initialQuestion();
+                    })
+                })
+            })
+        })
 }
