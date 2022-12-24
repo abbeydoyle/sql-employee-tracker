@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
 const fs = require("fs");
+const chalk = require('chalk')
 require("dotenv").config();
 
 // strings containing sql queries to be called on
@@ -30,12 +31,12 @@ const db = mysql.createConnection(
         password: process.env.password,
         database: 'employee_db'
       },
-      console.log(`Connected to the employee_db database.`)
+      console.log(chalk.bgHex('#526b48').white('\n Connected to the employee_db database \n'))
     );
 
     db.connect(err => {
       if (err) throw err;
-      console.log(`Database connection successful via id` + db.threadID);
+      // console.log(`Database connection successful via id` + db.threadID);
       initialQuestion();
 });
 
@@ -76,6 +77,7 @@ const initialQuestion = () => {
 viewEmployees = () => {
       db.query(`${queryEmployees}`, (err, result) => {
             if (err) throw err;
+            console.log(chalk.bgHex('#526b48').white('\n Viewing all employees: \n'))
             console.table(result);
             initialQuestion();
       })

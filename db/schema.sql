@@ -10,7 +10,7 @@ USE employee_db;
 -- primary key cannot be null, foreign key can
 
 CREATE TABLE department (
-      id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+      id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(30) NOT NULL
 );
 
