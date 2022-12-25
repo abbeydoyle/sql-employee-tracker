@@ -21,7 +21,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
+// Constant for database connection
 const db = mysql.createConnection(
       {
         host: 'localhost',
@@ -34,22 +34,25 @@ const db = mysql.createConnection(
       console.log(chalk.bgHex('#526b48').white('\n Connected to the employee_db database \n'))
     );
 
-    db.connect(err => {
+// Connect to database
+db.connect(err => {
       if (err) throw err;
       // console.log(`Database connection successful via id` + db.threadID);
       initialQuestion();
 });
 
-// opening question
+// opening question switch case
 const initialQuestion = () => {
+
       inquirer.prompt ([
             {
                   type: `list`,
                   name: `purpose`,
-                  message: `What would you like to do?`,
+                  message: `Welcome. If at any point you would like to exit the program, simply press the 'esc' key. What would you like to do?`,
                   choices: [`View all employees`, `Add employee`, `Update employee role`, `View all roles`, `Add role`, `View all departments`, 'Add department', `Exit application`]
             }
       ])
+
       .then(function(response) {
             switch (response.purpose) {
                   case "View all employees": viewEmployees();
@@ -66,7 +69,6 @@ const initialQuestion = () => {
                   break;
                   case "Add department": addDepartment();
                   break;
-                  // TODO: write app function
                   default: db.end;
                   exit();
                   break;
@@ -74,6 +76,7 @@ const initialQuestion = () => {
       });
 };
 
+// uses separate query file for viewing employees
 viewEmployees = () => {
       db.query(`${queryEmployees}`, (err, result) => {
             if (err) throw err;
@@ -83,6 +86,7 @@ viewEmployees = () => {
       })
 };
 
+// uses separate query file for viewing roles
 viewRoles = () => {
       db.query(`${queryRoles}`, (err, result) => {
             if (err) throw err;
@@ -92,6 +96,7 @@ viewRoles = () => {
       })
 };
 
+// uses separate query file for viewing departments
 viewDepartments = () => {
       db.query(`${queryDepartments}`, (err, result) => {
             if (err) throw err;
@@ -102,8 +107,10 @@ viewDepartments = () => {
 };
 
 addDepartment = () => {
+      // query all database values
       db.query(`SELECT * FROM department`, (err, result) =>{
             if (err) throw err;
+      
       inquirer.prompt ([
             {
                   type: `input`,
@@ -118,11 +125,15 @@ addDepartment = () => {
                         }
                   }
             }
+
       ]).then((response) => {
+            // query to insert response into department set
             db.query(`INSERT INTO department SET ?`, 
+
         {
             name: response.dptName,
         },
+
         (err, res) => {
             if (err) throw err;
             console.log(chalk.bgHex('#526b48').white(`\n ${response.dptName} successfully added to database \n`))
@@ -133,9 +144,12 @@ addDepartment = () => {
 };
 
 addRole = () => {
+      // select all values from department
       db.query(`SELECT * FROM department;`, (err, res) => {
             if (err) throw err;
+            // map department ids to department name to autopoluate in inquirer prompt 
             let departments = res.map(department => ({name: department.name, value: department.id }));
+
             inquirer.prompt([
                 {
                   type: 'input',
@@ -171,13 +185,17 @@ addRole = () => {
                   message: 'Which department do you want to add the new role to?',
                   choices: departments
                 }
+
             ]).then((response) => {
+                  // insert reponses into role set
                 db.query(`INSERT INTO role SET ?`, 
+
                 {
                     title: response.roleName,
                     salary: response.roleSalary,
                     department_id: response.roleDept,
                 },
+
                 (err, res) => {
                     if (err) throw err;
                     console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
@@ -188,13 +206,18 @@ addRole = () => {
 };
 
 addEmployees = () => {
+      // select all values from role set
       db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
+            // map role ids to role titles to autopopulate in prompt
             let roles = res.map(role => ({name: role.title, value: role.id }));
+            // select all employee values
             db.query(`SELECT * FROM employee;`, (err, res) => {
                 if (err) throw err;
+                // map employee ids to employees to populate to manager options
                 let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
                 inquirer.prompt ([
+
                   {
                         type: `input`,
                         name: `employeeFirst`,
@@ -236,10 +259,13 @@ addEmployees = () => {
                         message: `Who is the manager of this employee?`,
                         choices: employees,
                   }
-                ]).then((response) => {
-                  console.log(response.employeeFirst, response.employeeLast, response.employeeRole, response.employeeManager)
 
+                ]).then((response) => {
+                  // double check for no undefined values from joining
+                  console.log(response.employeeFirst, response.employeeLast, response.employeeRole, response.employeeManager)
+                        // insert responses into employee set
                     db.query(`INSERT INTO employee SET ?`, 
+
                     {
                         first_name: response.employeeFirst,
                         last_name: response.employeeLast,
@@ -251,6 +277,7 @@ addEmployees = () => {
                         if (err) throw err;
                         console.log('error not here')
                     })
+
                     console.log(chalk.bgHex('#526b48').white(`\n ${response.employeeFirst} ${response.employeeLast} has been successfully added to database \n`))
                     initialQuestion();
 
@@ -259,18 +286,20 @@ addEmployees = () => {
         })
 }
 
-
-// FIXME: update role
-
 updateEmployeeRole = () => {
+      // select all values from role
       db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
+            // map roles for autopopulating prompt
             let roles = res.map(role => ({name: role.title, value: role.id }));
 
+            // select all employee values
             db.query(`SELECT * FROM employee;`, (err, res) => {
                 if (err) throw err;
+                // map employee values for manager autopopulating
                 let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
                 inquirer.prompt([
+
                   {
                         type: `list`,
                         name: `employeeUpdate`,
@@ -286,6 +315,7 @@ updateEmployeeRole = () => {
                   },
 
                 ]).then((response) => {
+                        // update employee values
                     db.query(`UPDATE employee SET ? WHERE ?`, 
                     [
                         {
@@ -307,6 +337,7 @@ updateEmployeeRole = () => {
         })
 }
 
+// exit function
 function exit() {
       console.log(chalk.bgHex('#526b48').white(`\n Thank you for visiting. Please come again! \n`))
       process.exit();
