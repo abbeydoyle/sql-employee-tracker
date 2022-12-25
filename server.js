@@ -68,7 +68,7 @@ const initialQuestion = () => {
                   break;
                   // TODO: write app function
                   default: db.end;
-                  console.log(`Thank you for visiting!`);
+                  exit();
                   break;
             }
       });
@@ -180,7 +180,6 @@ addRole = () => {
                 },
                 (err, res) => {
                     if (err) throw err;
-                    console.log(`${response.roleName} successfully added to database`);
                     console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
                     initialQuestion();
                 })
@@ -188,7 +187,6 @@ addRole = () => {
         })
 };
 
-// FIXME: doesnt work
 addEmployees = () => {
       db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
@@ -240,6 +238,7 @@ addEmployees = () => {
                   }
                 ]).then((response) => {
                   console.log(response.employeeFirst, response.employeeLast, response.employeeRole, response.employeeManager)
+
                     db.query(`INSERT INTO employee SET ?`, 
                     {
                         first_name: response.employeeFirst,
@@ -247,51 +246,75 @@ addEmployees = () => {
                         role_id: response.employeeRole,
                         manager_id: response.employeeManager,
                     }, 
+
                     (err, res) => {
                         if (err) throw err;
                         console.log('error not here')
                     })
-                    db.query(`INSERT INTO role SET ?`, 
-                    {
-                        department_id: response.dept,
-                    }, 
-                    (err, res) => {
-                        if (err) throw err;
-                        console.log(`${response.employeeFirst} ${response.employeeLast} successfully added to database!`);
-                    })
+                    console.log(chalk.bgHex('#526b48').white(`\n ${response.employeeFirst} ${response.employeeLast} has been successfully added to database \n`))
                     initialQuestion();
-                  // let newEmployeeRole = "";
-                  // let newEmployeeManager = "";
-                  // db.query(`SELECT role_id FROM role WHERE role.title = "${response.employeeRole}"`, (err, result) => {
-                  //       if (err) throw err;
-                  //       newEmployeeRole = result[0].role_id;
-
-                  //           db.query(`SELECT manager.id as id FROM employee LEFT JOIN employee manager ON employee.manager_id = manager.id WHERE CONCAT(manager.first_name, " ", manager.last_name) = "${response.employeeManager}" GROUP BY manager.id;`, (err, result) => {
-                  //             if (err) throw err;
-                  //             newEmployeeManager = result[0].id;
-
-                  //             db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("${response.employeeFirst}", "${response.employeeLast}", ${newEmployeeRole}, ${newEmployeeManager})`, (err, result) => {
-                  //                   if (err) throw err;
-                  //                   initialQuestion();
-                  //             })
-                  //           })
-                  // })
-                  
 
                 })
             })
         })
 }
 
-// addEmployees = () => {
-//       db.query(`SELECT role.title AS title FROM role;`, (err, result) => {
-//             if (err) throw err;
-//             let roleArray = result
-//             let roles = roleArray.map(function (obj) {
-//                   return obj.title;
-//                 });
-            
-//                 db.query(`SELECT `)
-//       })
-      
-// }
+
+// FIXME: update role
+
+updateEmployeeRole = () => {
+      db.query(`SELECT * FROM role;`, (err, res) => {
+            if (err) throw err;
+            let roles = res.map(role => ({name: role.title, value: role.id }));
+
+            db.query(`SELECT * FROM employee;`, (err, res) => {
+                if (err) throw err;
+                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+                inquirer.prompt([
+                  {
+                        type: `list`,
+                        name: `employeeUpdate`,
+                        message: `Which employee would you like to update?`,
+                        choices: employees,
+                  },
+
+                  {
+                        type: `list`,
+                        name: `roleUpdate`,
+                        message: `What is this employee's new role?`,
+                        choices: roles,
+                  },
+
+                ]).then((response) => {
+                    db.query(`UPDATE employee SET ? WHERE ?`, 
+                    [
+                        {
+                            role_id: response.roleUpdate,
+                        },
+
+                        {
+                            id: response.employeeUpdate,
+                        },
+                    ], 
+
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log(chalk.bgHex('#526b48').white(`\n This role has been successfully updated in the employee database \n`))
+                        initialQuestion();
+                    })
+                })
+            })
+        })
+}
+
+function exit() {
+      console.log(chalk.bgHex('#526b48').white(`\n Thank you for visiting. Please come again! \n`))
+      process.exit();
+    }
+    
+// close inquirer input if user press "escape" key
+process.stdin.on('keypress', (_, key) => {
+      if (key.name === "escape") {
+            exit();
+      }
+    });
