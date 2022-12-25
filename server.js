@@ -192,10 +192,10 @@ addRole = () => {
 addEmployees = () => {
       db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
-            let roles = res.map(role => ({name: role.title, value: role.role_id }));
+            let roles = res.map(role => ({name: role.title, value: role.id }));
             db.query(`SELECT * FROM employee;`, (err, res) => {
                 if (err) throw err;
-                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.employee_id}));
+                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
                 inquirer.prompt ([
                   {
                         type: `input`,
