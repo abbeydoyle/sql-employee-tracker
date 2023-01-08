@@ -399,7 +399,7 @@ updateEmployeeManager = () => {
 }
 
 deleteEmployee = () => {
-      db.query(`SELECT * FROM employee;`, (err, res) => {
+      db.query(`SELECT * FROM role;`, (err, res) => {
             if (err) throw err;
             // map employee values for autopopulating
             let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
@@ -431,7 +431,35 @@ deleteEmployee = () => {
 }
 
 deleteRole = () => {
-      
+      db.query(`SELECT * FROM role;`, (err, res) => {
+            if (err) throw err;
+            // map employee values for autopopulating
+            let roles = res.map(role => ({name: role.title, value: role.id }));
+            inquirer.prompt([
+
+                  {
+                        type: `list`,
+                        name: `roleUpdate`,
+                        message: `Which role would you like to delete?`,
+                        choices: roles,
+                  },
+
+            ]).then((response) => {
+                        // delete employee matching id
+                  db.query(`DELETE FROM role WHERE ?`, 
+                  [
+                        {
+                        id: response.roleUpdate,
+                        },
+                  ], 
+
+                  (err, res) => {
+                        if (err) throw err;
+                        console.log(chalk.bgHex('#526b48').white(`\n This role has been successfully deleted in the employee database \n`))
+                        initialQuestion();
+                  })
+            })
+      })
 }
 
 deleteDepartment = () => {
