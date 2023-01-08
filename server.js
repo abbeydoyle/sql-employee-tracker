@@ -394,12 +394,40 @@ updateEmployeeManager = () => {
                         initialQuestion();
                   })
             })
-            })
+      })
       
 }
 
 deleteEmployee = () => {
-      
+      db.query(`SELECT * FROM employee;`, (err, res) => {
+            if (err) throw err;
+            // map employee values for autopopulating
+            let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+            inquirer.prompt([
+
+                  {
+                        type: `list`,
+                        name: `employeeUpdate`,
+                        message: `Which employee would you like to delete?`,
+                        choices: employees,
+                  },
+
+            ]).then((response) => {
+                        // delete employee matching id
+                  db.query(`DELETE FROM employee WHERE ?`, 
+                  [
+                        {
+                        id: response.employeeUpdate,
+                        },
+                  ], 
+
+                  (err, res) => {
+                        if (err) throw err;
+                        console.log(chalk.bgHex('#526b48').white(`\n This employee has been successfully deleted in the employee database \n`))
+                        initialQuestion();
+                  })
+            })
+      })
 }
 
 deleteRole = () => {
