@@ -160,7 +160,7 @@ If you created an application or package and would like other developers to cont
 
 - Press ‘esc’ at any time to end the process
 - Try to bypass an inquirer prompt and receive an error message
-- Update an employee's role and then select "View all employees" to verify your change occurred
+- Update an employee's role then select "View all employees" to verify your change occurred
 
 
 

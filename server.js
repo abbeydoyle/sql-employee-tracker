@@ -49,7 +49,7 @@ const initialQuestion = () => {
                   type: `list`,
                   name: `purpose`,
                   message: `Welcome. If at any point you would like to exit the program, simply press the 'esc' key. What would you like to do?`,
-                  choices: [`View all employees`, `Add employee`, `Update employee role`, `View all roles`, `Add role`, `View all departments`, 'Add department', `Exit application`]
+                  choices: [`View all employees`, `View all roles`, `View all departments`, `Add employee`, `Add role`, 'Add department', `Update employee's role`, `Update employee's manager`, `Delete employee`, `Delete role`, `Delete department`, `View employees by manager`, `View employees by department`, `View department's totalized budget`, `Exit application`]
             }
       ])
 
@@ -57,17 +57,31 @@ const initialQuestion = () => {
             switch (response.purpose) {
                   case "View all employees": viewEmployees();
                   break;
-                  case "Add employee": addEmployees();
-                  break;
-                  case "Update employee role": updateEmployeeRole();
-                  break;
                   case "View all roles": viewRoles();
-                  break;
-                  case "Add role": addRole();
                   break;
                   case "View all departments": viewDepartments();
                   break;
+                  case "Add employee": addEmployees();
+                  break;
+                  case "Add role": addRole();
+                  break;
                   case "Add department": addDepartment();
+                  break;
+                  case "Update employee's role": updateEmployeeRole();
+                  break;
+                  case "Update employee's manager": updateEmployeeManager();
+                  break;
+                  case "Delete employee": deleteEmployee();
+                  break;
+                  case "Delete role": deleteRole();
+                  break;
+                  case "Delete department": deleteDepartment();
+                  break;
+                  case "View employees by manager": sortEmployeesByManager();
+                  break;
+                  case "View employees by department": sortEmployeesByDepartment();
+                  break;
+                  case "View department's totalized budget": totalizeDepartmentBudget();
                   break;
                   default: db.end;
                   exit();
@@ -104,105 +118,6 @@ viewDepartments = () => {
             console.table(result);
             initialQuestion();
       })
-};
-
-addDepartment = () => {
-      // query all database values
-      db.query(`SELECT * FROM department`, (err, result) =>{
-            if (err) throw err;
-      
-      inquirer.prompt ([
-            {
-                  type: `input`,
-                  name: `dptName`,
-                  message: `What is the name of this department?`,
-                  validate: (dptNameInput) => {
-                        if (dptNameInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter the department name`);
-                              return false;
-                        }
-                  }
-            }
-
-      ]).then((response) => {
-            // query to insert response into department set
-            db.query(`INSERT INTO department SET ?`, 
-
-        {
-            name: response.dptName,
-        },
-
-        (err, res) => {
-            if (err) throw err;
-            console.log(chalk.bgHex('#526b48').white(`\n ${response.dptName} successfully added to database \n`))
-            initialQuestion();
-        })
-      })
-})
-};
-
-addRole = () => {
-      // select all values from department
-      db.query(`SELECT * FROM department;`, (err, res) => {
-            if (err) throw err;
-            // map department ids to department name to autopoluate in inquirer prompt 
-            let departments = res.map(department => ({name: department.name, value: department.id }));
-
-            inquirer.prompt([
-                {
-                  type: 'input',
-                  name: 'roleName',
-                  message: 'What is the name of the role you want to add?',  
-                  validate: (roleNameInput) => {
-                        if (roleNameInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter the role`);
-                              return false;
-                        }
-                  }
-                },
-
-                {
-                  type: 'input',
-                  name: 'roleSalary',
-                  message: 'What is the salary of the role you want to add?',
-                  validate: (roleSalaryInput) => {
-                        if (roleSalaryInput) {
-                              return true;
-                        } else {
-                              console.log(`Please enter the salary`);
-                              return false;
-                        }
-                  }
-                },
-
-                {
-                  type: 'list',
-                  name: 'roleDept',
-                  message: 'Which department do you want to add the new role to?',
-                  choices: departments
-                }
-
-            ]).then((response) => {
-                  // insert reponses into role set
-                db.query(`INSERT INTO role SET ?`, 
-
-                {
-                    title: response.roleName,
-                    salary: response.roleSalary,
-                    department_id: response.roleDept,
-                },
-
-                (err, res) => {
-                    if (err) throw err;
-                    console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
-                    initialQuestion();
-                })
-            })
-        })
 };
 
 addEmployees = () => {
@@ -286,6 +201,105 @@ addEmployees = () => {
         })
 }
 
+addRole = () => {
+      // select all values from department
+      db.query(`SELECT * FROM department;`, (err, res) => {
+            if (err) throw err;
+            // map department ids to department name to autopoluate in inquirer prompt 
+            let departments = res.map(department => ({name: department.name, value: department.id }));
+
+            inquirer.prompt([
+                {
+                  type: 'input',
+                  name: 'roleName',
+                  message: 'What is the name of the role you want to add?',  
+                  validate: (roleNameInput) => {
+                        if (roleNameInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter the role`);
+                              return false;
+                        }
+                  }
+                },
+
+                {
+                  type: 'input',
+                  name: 'roleSalary',
+                  message: 'What is the salary of the role you want to add?',
+                  validate: (roleSalaryInput) => {
+                        if (roleSalaryInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter the salary`);
+                              return false;
+                        }
+                  }
+                },
+
+                {
+                  type: 'list',
+                  name: 'roleDept',
+                  message: 'Which department do you want to add the new role to?',
+                  choices: departments
+                }
+
+            ]).then((response) => {
+                  // insert reponses into role set
+                db.query(`INSERT INTO role SET ?`, 
+
+                {
+                    title: response.roleName,
+                    salary: response.roleSalary,
+                    department_id: response.roleDept,
+                },
+
+                (err, res) => {
+                    if (err) throw err;
+                    console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
+                    initialQuestion();
+                })
+            })
+        })
+};
+
+addDepartment = () => {
+      // query all database values
+      db.query(`SELECT * FROM department`, (err, result) =>{
+            if (err) throw err;
+      
+      inquirer.prompt ([
+            {
+                  type: `input`,
+                  name: `dptName`,
+                  message: `What is the name of this department?`,
+                  validate: (dptNameInput) => {
+                        if (dptNameInput) {
+                              return true;
+                        } else {
+                              console.log(`Please enter the department name`);
+                              return false;
+                        }
+                  }
+            }
+
+      ]).then((response) => {
+            // query to insert response into department set
+            db.query(`INSERT INTO department SET ?`, 
+
+        {
+            name: response.dptName,
+        },
+
+        (err, res) => {
+            if (err) throw err;
+            console.log(chalk.bgHex('#526b48').white(`\n ${response.dptName} successfully added to database \n`))
+            initialQuestion();
+        })
+      })
+})
+};
+
 updateEmployeeRole = () => {
       // select all values from role
       db.query(`SELECT * FROM role;`, (err, res) => {
@@ -335,6 +349,77 @@ updateEmployeeRole = () => {
                 })
             })
         })
+}
+
+// TODO: bonus functions
+
+updateEmployeeManager = () => {
+       // select all employee values
+      db.query(`SELECT * FROM employee;`, (err, res) => {
+            if (err) throw err;
+            // map employee values for manager autopopulating
+            let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+            inquirer.prompt([
+
+                  {
+                        type: `list`,
+                        name: `employeeUpdate`,
+                        message: `Which employee would you like to update?`,
+                        choices: employees,
+                  },
+
+                  {
+                        type: `list`,
+                        name: `managerUpdate`,
+                        message: `Who is this employee's manager?`,
+                        choices: employees,
+                  },
+
+            ]).then((response) => {
+                        // update employee values
+                  db.query(`UPDATE employee SET ? WHERE ?`, 
+                  [
+                        {
+                        manager_id: response.managerUpdate,
+                        },
+
+                        {
+                        id: response.employeeUpdate,
+                        },
+                  ], 
+
+                  (err, res) => {
+                        if (err) throw err;
+                        console.log(chalk.bgHex('#526b48').white(`\n This employee's manager has been successfully updated in the employee database \n`))
+                        initialQuestion();
+                  })
+            })
+            })
+      
+}
+
+deleteEmployee = () => {
+      
+}
+
+deleteRole = () => {
+      
+}
+
+deleteDepartment = () => {
+      
+}
+
+sortEmployeesByManager = () => {
+      
+}
+
+sortEmployeesByDepartment = () => {
+      
+}
+
+totalizeDepartmentBudget = () => {
+
 }
 
 // exit function
