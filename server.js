@@ -463,7 +463,35 @@ deleteRole = () => {
 }
 
 deleteDepartment = () => {
-      
+      db.query(`SELECT * FROM department;`, (err, res) => {
+            if (err) throw err;
+            // map employee values for autopopulating
+            let departments = res.map(department => ({name: department.name, value: department.id }));
+            inquirer.prompt([
+
+                  {
+                        type: `list`,
+                        name: `departmentUpdate`,
+                        message: `Which department would you like to delete?`,
+                        choices: departments,
+                  },
+
+            ]).then((response) => {
+                        // delete employee matching id
+                  db.query(`DELETE FROM department WHERE ?`, 
+                  [
+                        {
+                        id: response.departmentUpdate,
+                        },
+                  ], 
+
+                  (err, res) => {
+                        if (err) throw err;
+                        console.log(chalk.bgHex('#526b48').white(`\n This department has been successfully deleted in the employee database \n`))
+                        initialQuestion();
+                  })
+            })
+      })
 }
 
 sortEmployeesByManager = () => {
