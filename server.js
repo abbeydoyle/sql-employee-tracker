@@ -122,15 +122,15 @@ viewDepartments = () => {
 
 addEmployees = () => {
       // select all values from role set
-      db.query(`SELECT * FROM role;`, (err, res) => {
+      db.query(`SELECT * FROM role;`, (err, result) => {
             if (err) throw err;
             // map role ids to role titles to autopopulate in prompt
-            let roles = res.map(role => ({name: role.title, value: role.id }));
+            let roles = result.map(role => ({name: role.title, value: role.id }));
             // select all employee values
-            db.query(`SELECT * FROM employee;`, (err, res) => {
+            db.query(`SELECT * FROM employee;`, (err, result) => {
                 if (err) throw err;
                 // map employee ids to employees to populate to manager options
-                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
+                let employees = result.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id}));
                 inquirer.prompt ([
 
                   {
@@ -188,9 +188,8 @@ addEmployees = () => {
                         manager_id: response.employeeManager,
                     }, 
 
-                    (err, res) => {
+                    (err, result) => {
                         if (err) throw err;
-                        console.log('error not here')
                     })
 
                     console.log(chalk.bgHex('#526b48').white(`\n ${response.employeeFirst} ${response.employeeLast} has been successfully added to database \n`))
@@ -203,10 +202,10 @@ addEmployees = () => {
 
 addRole = () => {
       // select all values from department
-      db.query(`SELECT * FROM department;`, (err, res) => {
+      db.query(`SELECT * FROM department;`, (err, result) => {
             if (err) throw err;
             // map department ids to department name to autopoluate in inquirer prompt 
-            let departments = res.map(department => ({name: department.name, value: department.id }));
+            let departments = result.map(department => ({name: department.name, value: department.id }));
 
             inquirer.prompt([
                 {
@@ -254,7 +253,7 @@ addRole = () => {
                     department_id: response.roleDept,
                 },
 
-                (err, res) => {
+                (err, result) => {
                     if (err) throw err;
                     console.log(chalk.bgHex('#526b48').white(`\n ${response.roleName} successfully added to database \n`))
                     initialQuestion();
@@ -291,7 +290,7 @@ addDepartment = () => {
             name: response.dptName,
         },
 
-        (err, res) => {
+        (err, result) => {
             if (err) throw err;
             console.log(chalk.bgHex('#526b48').white(`\n ${response.dptName} successfully added to database \n`))
             initialQuestion();
@@ -302,16 +301,16 @@ addDepartment = () => {
 
 updateEmployeeRole = () => {
       // select all values from role
-      db.query(`SELECT * FROM role;`, (err, res) => {
+      db.query(`SELECT * FROM role;`, (err, result) => {
             if (err) throw err;
             // map roles for autopopulating prompt
-            let roles = res.map(role => ({name: role.title, value: role.id }));
+            let roles = result.map(role => ({name: role.title, value: role.id }));
 
             // select all employee values
-            db.query(`SELECT * FROM employee;`, (err, res) => {
+            db.query(`SELECT * FROM employee;`, (err, result) => {
                 if (err) throw err;
                 // map employee values for manager autopopulating
-                let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+                let employees = result.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
                 inquirer.prompt([
 
                   {
@@ -341,7 +340,7 @@ updateEmployeeRole = () => {
                         },
                     ], 
 
-                    (err, res) => {
+                    (err, result) => {
                         if (err) throw err;
                         console.log(chalk.bgHex('#526b48').white(`\n This role has been successfully updated in the employee database \n`))
                         initialQuestion();
@@ -355,10 +354,10 @@ updateEmployeeRole = () => {
 
 updateEmployeeManager = () => {
        // select all employee values
-      db.query(`SELECT * FROM employee;`, (err, res) => {
+      db.query(`SELECT * FROM employee;`, (err, result) => {
             if (err) throw err;
             // map employee values for manager autopopulating
-            let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+            let employees = result.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
             inquirer.prompt([
 
                   {
@@ -388,7 +387,7 @@ updateEmployeeManager = () => {
                         },
                   ], 
 
-                  (err, res) => {
+                  (err, result) => {
                         if (err) throw err;
                         console.log(chalk.bgHex('#526b48').white(`\n This employee's manager has been successfully updated in the employee database \n`))
                         initialQuestion();
@@ -399,10 +398,10 @@ updateEmployeeManager = () => {
 }
 
 deleteEmployee = () => {
-      db.query(`SELECT * FROM role;`, (err, res) => {
+      db.query(`SELECT * FROM role;`, (err, result) => {
             if (err) throw err;
             // map employee values for autopopulating
-            let employees = res.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
+            let employees = result.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
             inquirer.prompt([
 
                   {
@@ -421,7 +420,7 @@ deleteEmployee = () => {
                         },
                   ], 
 
-                  (err, res) => {
+                  (err, result) => {
                         if (err) throw err;
                         console.log(chalk.bgHex('#526b48').white(`\n This employee has been successfully deleted in the employee database \n`))
                         initialQuestion();
@@ -431,10 +430,10 @@ deleteEmployee = () => {
 }
 
 deleteRole = () => {
-      db.query(`SELECT * FROM role;`, (err, res) => {
+      db.query(`SELECT * FROM role;`, (err, result) => {
             if (err) throw err;
             // map employee values for autopopulating
-            let roles = res.map(role => ({name: role.title, value: role.id }));
+            let roles = result.map(role => ({name: role.title, value: role.id }));
             inquirer.prompt([
 
                   {
@@ -453,7 +452,7 @@ deleteRole = () => {
                         },
                   ], 
 
-                  (err, res) => {
+                  (err, result) => {
                         if (err) throw err;
                         console.log(chalk.bgHex('#526b48').white(`\n This role has been successfully deleted in the employee database \n`))
                         initialQuestion();
@@ -463,10 +462,10 @@ deleteRole = () => {
 }
 
 deleteDepartment = () => {
-      db.query(`SELECT * FROM department;`, (err, res) => {
+      db.query(`SELECT * FROM department;`, (err, result) => {
             if (err) throw err;
             // map employee values for autopopulating
-            let departments = res.map(department => ({name: department.name, value: department.id }));
+            let departments = result.map(department => ({name: department.name, value: department.id }));
             inquirer.prompt([
 
                   {
@@ -485,7 +484,7 @@ deleteDepartment = () => {
                         },
                   ], 
 
-                  (err, res) => {
+                  (err, result) => {
                         if (err) throw err;
                         console.log(chalk.bgHex('#526b48').white(`\n This department has been successfully deleted in the employee database \n`))
                         initialQuestion();
@@ -495,7 +494,32 @@ deleteDepartment = () => {
 }
 
 sortEmployeesByManager = () => {
-      
+      db.query(`SELECT * FROM employee;`, (err, result) => {
+            if (err) throw err;
+            let managers = result
+                  .filter((employee) => !employee.manager_id)
+                  .map((employee) => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }))
+            inquirer.prompt([
+                  {
+                        type: `list`,
+                        name: `managerEmployees`,
+                        message: `Which manager's group would you like to view?`,
+                        choices: managers,
+                  },
+            ]).then((response) => {
+                db.query(
+                  // `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) manager FROM employee manager RIGHT JOIN employee ON employee.manager_id = employee.id JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id WHERE employee.manager_id = ${response.managerEmployees} ORDER BY employee.id ASC`
+                  `SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, " ", manager.last_name) AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id WHERE manager.id = ${response.managerEmployees}`
+                  // `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) manager FROM employee manager RIGHT JOIN employee ON employee.manager_id = manager.employee_id JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id WHERE employee.manager_id = ${response.managerEmployees} ORDER BY employee.id ASC`
+                  , 
+                (err, result) => {
+                    if (err) throw err;
+                    console.log(chalk.bgHex('#526b48').white('\n Viewing employees: \n'))
+                    console.table(result);
+                    initialQuestion();
+                })
+            })
+        })
 }
 
 sortEmployeesByDepartment = () => {
