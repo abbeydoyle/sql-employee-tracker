@@ -350,8 +350,6 @@ updateEmployeeRole = () => {
         })
 }
 
-// TODO: bonus functions
-
 updateEmployeeManager = () => {
        // select all employee values
       db.query(`SELECT * FROM employee;`, (err, result) => {
@@ -497,6 +495,7 @@ sortEmployeesByManager = () => {
       db.query(`SELECT * FROM employee;`, (err, result) => {
             if (err) throw err;
             let managers = result
+                  // filter to show employees with a manager id aka managers
                   .filter((employee) => !employee.manager_id)
                   .map((employee) => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }))
             inquirer.prompt([
@@ -507,11 +506,8 @@ sortEmployeesByManager = () => {
                         choices: managers,
                   },
             ]).then((response) => {
-                db.query(
-                  // `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) manager FROM employee manager RIGHT JOIN employee ON employee.manager_id = employee.id JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id WHERE employee.manager_id = ${response.managerEmployees} ORDER BY employee.id ASC`
-                  `SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, " ", manager.last_name) AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id WHERE manager.id = ${response.managerEmployees}`
-                  // `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) manager FROM employee manager RIGHT JOIN employee ON employee.manager_id = manager.employee_id JOIN role ON employee.role_id = role.id JOIN department ON department.id = role.department_id WHERE employee.manager_id = ${response.managerEmployees} ORDER BY employee.id ASC`
-                  , 
+                // join table if employee manager ids match user input
+                db.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, " ", manager.last_name) AS Manager FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id WHERE manager.id = ${response.managerEmployees}`, 
                 (err, result) => {
                     if (err) throw err;
                     console.log(chalk.bgHex('#526b48').white('\n Viewing employees: \n'))
@@ -523,11 +519,55 @@ sortEmployeesByManager = () => {
 }
 
 sortEmployeesByDepartment = () => {
-      
+      db.query(`SELECT * FROM department;`, (err, result) => {
+            if (err) throw err;
+            let departments = result.map(department => ({name: department.name, value: department.id }))
+            inquirer.prompt([
+                  {
+                        type: `list`,
+                        name: `departmentEmployees`,
+                        message: `Which department's employees would you like to view?`,
+                        choices: departments,
+                  },
+            ]).then((response) => {
+                // join table if employee department ids match user input
+                db.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE department.id = ${response.departmentEmployees}`, 
+                (err, result) => {
+                    if (err) throw err;
+                    console.log(chalk.bgHex('#526b48').white('\n Viewing employees: \n'))
+                    console.table(result);
+                    initialQuestion();
+                })
+            })
+        })
 }
 
-totalizeDepartmentBudget = () => {
 
+totalizeDepartmentBudget = () => {
+      db.query(`SELECT * FROM department;`, (err, result) => {
+            if (err) throw err;
+            let departments = result.map(department => ({name: department.name, value: department.id }))
+            inquirer.prompt([
+                  {
+                        type: `list`,
+                        name: `departmentBudget`,
+                        message: `Which department would you like to view the budget of?`,
+                        choices: departments,
+                  },
+            ]).then((response) => {
+
+                // join table if employee department ids match user input
+                db.query(
+                  `SELECT department.name, SUM(role.salary) FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id WHERE role.department_id = ${response.departmentBudget}`
+                  ,
+                (err, result) => {
+                    if (err) throw err;
+                    console.log(chalk.bgHex('#526b48').white('\n Viewing budget: \n'))
+                    console.table(result);
+                    initialQuestion();
+                })
+            })
+        })
 }
 
 // exit function
