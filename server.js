@@ -396,7 +396,7 @@ updateEmployeeManager = () => {
 }
 
 deleteEmployee = () => {
-      db.query(`SELECT * FROM role;`, (err, result) => {
+      db.query(`SELECT * FROM employee;`, (err, result) => {
             if (err) throw err;
             // map employee values for autopopulating
             let employees = result.map(employee => ({name: employee.first_name + ' ' + employee.last_name, value: employee.id }));
@@ -541,7 +541,6 @@ sortEmployeesByDepartment = () => {
             })
         })
 }
-
 
 totalizeDepartmentBudget = () => {
       db.query(`SELECT * FROM department;`, (err, result) => {

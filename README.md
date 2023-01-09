@@ -3,8 +3,7 @@ An app to view and manage the departments, roles, and employees in a company
 
 ## Description
 
-This project uses npm, inquirer, fs, jest, and javascript to generate a Team Portfolio Page with user input. All input is given within the terminal using Inquirer, a command line interface for Node.js. With user input, the portfolio page has custom color themes. There are employee-specific prompts, allowing for more personilized employee cards. This webpage file is then written into the project repository with the Node File System module. Each class and subclass was tested using Jest script tests, ensuring the correct object types and function returns. This project introduced working in the command line with Node Package Manager (npm), using javascript to create functions, inquirer prompts, and a string that will populate the webpage.
-
+This project uses npm, inquirer, fs, sql, and javascript to generate an employee tracker database with user input. All input is given within the terminal using Inquirer, a command line interface for Node.js. With prompt inputs, a user can view, create, update, and delete employees, roles, and departments. Employees can also be filtered by managers and departments. Each department's totalized budget can be viewed as well. This database can be built from the ground up or altered by sourcing the seeds.sql file.
 
 <!-- Provide a short description explaining the what, why, and how of your project. Use the following questions as a guide:
 
@@ -33,52 +32,44 @@ Applications required for use:
 - Node.js 
 
 Initialization: 
-- Copy the SSH code within this Github Repo 
-- In the terminal, type “git clone {SSH Code}” 
-- In the terminal, use the command "npm init -y" to install Node Package Manager 
-- Use the command "npm install inquirer" to get npm's inquirer package 
-- Use the command "npm install --save-dev jest" to get npm's jest package 
-- Ensure proper installation with the command "npm test" in the terminal
-- Still in the terminal, type “node index.js” 
-- Simply follow the prompts to create your team's Portfolio Page
-- Once complete, your index.html file will be written into the dist folder
+Copy the SSH code within this Github Repo 
+```
+git clone {SSH Code}
+npm init -y
+npm install --save mysql2
+npm i inquirer@8.2.4
+npm install console.table --save
+mysql -u root -p
+source db/schema.sql
+source db/seeds.sql *
+exit
+node server.js
+```
+*skip this code entry if you would like to begin with a completely empty database
 <!-- What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running. -->
 
 
 ## Usage
 
-There are 10 main sections of this repository:
+There are 7 main sections of this repository:
 
-- [SRC Folder](https://github.com/abbeydoyle/team-profile-generator/tree/main/src) - Contains a text file for ideas, a [generateHTML.js](https://github.com/abbeydoyle/team-profile-generator/blob/main/src/generateHTML.js) file, encoding the functions to create the Team Portfolio webpage based on the user input gathered from inquirer
+- [server.js](https://github.com/abbeydoyle/sql-employee-tracker/blob/main/server.js) - Contains the main script of this application, including the inquirer prompts and all case functions
 
-- [index.js](https://github.com/abbeydoyle/team-profile-generator/blob/main/index.html) - Contains the main script of this application, encluding the file writing system and inquirer prompts
-
-- [Dist Folder](https://github.com/abbeydoyle/team-profile-generator/tree/main/dist) - Created by the script to contain the index.html file generated through this app
-
-- [Lib Folder](https://github.com/abbeydoyle/team-profile-generator/tree/main/lib) - Contains the scripts containing class and subclass creation
+- [DB Folder](https://github.com/abbeydoyle/sql-employee-tracker/tree/main/db) - Contains the schema and seeds sql files, along with the sql files encoding the 'View All' queries
 
 - [Notes Folder](https://github.com/abbeydoyle/team-profile-generator/tree/main/notes) - Contains a text file for ideas, a [structure.html](https://github.com/abbeydoyle/team-profile-generator/blob/main/notes/structure.html) html page to envision the final product of this application, and graveyard javascript files to place nonworking code for future reference
 
-- [Test Folder](https://github.com/abbeydoyle/team-profile-generator/tree/main/test) - Contains Jest testing scripts for each class and subclass functions
+- [Graveyard Folder](https://github.com/abbeydoyle/sql-employee-tracker/tree/main/graveyard) - Contains nonworking code for future reference
 
-- [gitignore](https://github.com/abbeydoyle/team-profile-generator/blob/main/.gitignore) - Contains all files to be ignored in the Github repository
+- [gitignore](https://github.com/abbeydoyle/sql-employee-tracker/blob/main/.gitignore) - Contains all files to be ignored in the Github repository
 
-- [License](https://github.com/abbeydoyle/module-two-challenge/blob/main/LICENSE) - Contains the webpage license
+- [License](https://github.com/abbeydoyle/sql-employee-tracker/blob/main/LICENSE) - Contains the application license
 
-- [ReadMe](https://github.com/abbeydoyle/module-two-challenge/blob/main/README.md) - This file containing an executive overview of the project
+- [ReadMe](https://github.com/abbeydoyle/sql-employee-tracker/blob/main/README.md) - This file containing an executive overview of the project
 
-- [Sample Webpage](https://abbeydoyle.github.io/team-profile-generator/) - This app has been used to generate a sample Team Portfolio that has been deployed at this link via Github Pages
+Click the gif below to be redirected to the recorded video of this app in use.
 
-Generated Webpage: [https://abbeydoyle.github.io/team-profile-generator/](https://abbeydoyle.github.io/team-profile-generator/)
-
-![Screencastify demonstration](./dist/team-profile.gif)
-![Earthy green](./dist/earthy%20green.png)
-![Muted blues](./dist/muted%20blues.png)
-![Rustic orange](./dist/rustic%20orange.png)
-![Dusty pink](./dist/Dusty%20pink.png)
-![Neutral](./dist/black-white.png)
-
-
+[![Screencastify demonstration](./graveyard/employee_tracker.gif)](https://drive.google.com/file/d/1PImDcC3eLUBW3fNFCsXXFztmgSc3FtUB/view)
 
 
 <!-- Provide instructions and examples for use. Include screenshots as needed.
@@ -114,19 +105,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Badges
 
-![badmath](https://img.shields.io/github/repo-size/abbeydoyle/team-profile-generator?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/repo-size/abbeydoyle/sql-employee-tracker?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/github/issues-closed-raw/abbeydoyle/team-profile-generator?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/issues-closed-raw/abbeydoyle/sql-employee-tracker?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/github/issues-raw/abbeydoyle/team-profile-generator?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/issues-raw/abbeydoyle/sql-employee-tracker?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/github/license/abbeydoyle/team-profile-generator?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/license/abbeydoyle/sql-employee-tracker?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/github/commits-since/abbeydoyle/team-profile-generator/7aaca42/main?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/commits-since/abbeydoyle/sql-employee-tracker/765ff6d/main?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/github/last-commit/abbeydoyle/team-profile-generator?color=pink&style=plastic)
+![badmath](https://img.shields.io/github/last-commit/abbeydoyle/sql-employee-tracker?color=pink&style=plastic)
 
-![badmath](https://img.shields.io/maintenance/yes/2022?color=pink&style=plastic)
+![badmath](https://img.shields.io/maintenance/yes/2023?color=pink&style=plastic)
 
 
 <!-- ![badmath](https://img.shields.io/github/languages/top/lernantino/badmath)
@@ -135,19 +126,15 @@ Badges aren't necessary, per se, but they demonstrate street cred. Badges let ot
 
 ## Features
 
-This page features:
+This app features:
 
 - Keypress function to end process when ‘esc’ is pressed 
 - Error messages if no input is given 
-- File written directly into user’s system 
-- Separate card generation based on employee role
-- Email verification
-- Jest class tests
-- Built in Tailwind CSS
-- Email links for all employees
-- Github portfolio links for engineers
-- Custom Color Themes
-
+- Add functions for employees, roles, and departments
+- Capability to update an employee's role or manager
+- Delete functionw for employees, roles, and departments
+- Capability to filter employees by manager or department
+- Capability to view the totalized budget of each department
 
 
 <!-- If your project has a lot of features, list them here. -->
@@ -160,18 +147,10 @@ If you created an application or package and would like other developers to cont
 
 - Press ‘esc’ at any time to end the process
 - Try to bypass an inquirer prompt and receive an error message
-- Update an employee's role then select "View all employees" to verify your change occurred
-
-
-
-- Select different employee types for role-specific prompts
-- Add as many employees as desired and watch the correct card types and count populate
-- Select an employee's email and your email program will open and populate the TO field
-- Select your engineer's Github profile name and their portfolio will open
-- Attempt to bypass a prompt and an error message will appear
-- Attempt to type in a non-email string in the email prompt and an error message will appear
-- Run the built in Jest tests with the command "npm test"
-- Try out a different color theme each time!
-
+- Add an employee, role, or department then select "View all employees/roles/departments" to verify your addition occurred
+- Update an employee's role or manager then select "View all employees" to verify your change occurred
+- Delete an employee, role, or department then select "View all employees/roles/departments" to verify your deletion occurred
+- Sort employees by various managers or departments to view a more succinct list
+- View a department's budget as the totalized salary of that department's employees
 
 <!-- Go the extra mile and write tests for your application. Then provide examples on how to run them here. -->
